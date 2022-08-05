@@ -2,6 +2,15 @@
 
 An application is used to executing native database query based on annotations, then mapping the response to DTO classes
 
+# Install dependency from Maven Central repository
+```
+<dependency>
+    <groupId>io.github.hvantran</groupId>
+    <artifactId>native-db-client</artifactId>
+    <version>1.0.0</version>
+</dependency>
+```
+
 
 # Using
 
