@@ -1,8 +1,15 @@
 # native-db-client
 
-An application is used to executing native database query based on annotations, then mapping the response to DTO classes
 
-## 1. Install dependency from Maven Central repository
+## 1. Intro
+An simple java libary to executing SQL query, with this libary we can
+
+- Easy to create and execute SQL query to database with supported annotations
+- Mapping response of select clause to DTO classes
+- Lazy init connection to database util the first method to repository is called
+- Only one database connection for each repository instance, that mean executing next method in repository will use the existing connection
+
+## 2. Install dependency from Maven Central repository
 ```
 <dependency>
     <groupId>io.github.hvantran</groupId>
@@ -10,7 +17,7 @@ An application is used to executing native database query based on annotations, 
     <version>1.0.0</version>
 </dependency>
 ```
-## 2. Annotations
+## 3. Annotations
 ### a. Database
 **Database** annotation respresent for database connection.
 It supports to input connection directly or binding from properties by using **{}** syntax
@@ -45,7 +52,7 @@ It supports prammeterize by using **{}** syntax, and can combine with below anno
 ### g. Column
 **Column** annotation represent for a column in database, it will be mapped to a property in instances
 
-## 3. Using
+## 4. Using
 
 ### DTO classes
 **DTO** classes are using to mapping the collumns in response of SELECT command to DTO instances
@@ -106,12 +113,11 @@ public interface EndpointSettingRepository extends GenericRepository {
 
 **That all what we need, now we can use the repositories**
 
-### Using repositories
+### 5. Using repositories
 
 Step 1: Create repository instances by using **RepoProxyFactory**
-
 ```
-    // Load properties file
+    // Load properties file (optional)
     InputStream resource = MOnkeyAccountCheckerV1.class.getClassLoader().getResourceAsStream("application.properties");
     Properties properties = new Properties();
     properties.load(resource);
@@ -126,12 +132,12 @@ Step 2: **Execute queries**
     System.out.println(endpointSettings);
 
     List<EndpointResponseVO> endpointResponses = endpointSettingRepository
-            .getEndpointResponses(EndpointResponseVO.class, monkeyEndpointSettingIds.get(0).getId(), "'A%'");
+            .getEndpointResponses(EndpointResponseVO.class, endpointSettings.get(0).getId(), "'A%'");
     System.out.println(endpointResponses);
     
-    endpointSettingRepository.updateEndpointResponse("'abcdsaefasd'", monkeyEndpointResponse.get(0).getId());
+    endpointSettingRepository.updateEndpointResponse("'abcdsaefasd'", endpointSettings.get(0).getId());
     
-    endpointSettingRepository.deleteEndpointResponse(monkeyEndpointResponse.get(0).getId());
+    endpointSettingRepository.deleteEndpointResponse(endpointSettings.get(0).getId());
     endpointSettingRepository.insertEndpointResponse("1");
 
     endpointResponses= endpointSettingRepository.getEndpointResponseByNativeQuery("1", EndpointSettingIdVO.class);
