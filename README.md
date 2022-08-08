@@ -2,11 +2,12 @@
 
 
 ## 1. Intro
-An simple java libary to executing SQL query, with this libary we can
+An simple java libary to executing SQL queries, with this libary we can
 
 - Easy to create and execute SQL query to database with supported annotations
 - Mapping response of select clause to DTO classes
-- Lazy init connection to database util the first method to repository is called
+- Parameterize the SQL queries with method arguments
+- Lazy init connection to database util the first method in repository is called
 - Only one database connection for each repository instance, that mean executing next method in repository will use the existing connection
 
 ## 2. Install dependency from Maven Central repository
@@ -51,6 +52,9 @@ It supports prammeterize by using **{}** syntax, and can combine with below anno
 
 ### g. Column
 **Column** annotation represent for a column in database, it will be mapped to a property in instances
+
+### h. Param
+**Param** annotation will matching a method argument with SQL query param
 
 ## 4. Using
 
