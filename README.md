@@ -14,7 +14,7 @@ An simple java libary to executing SQL query, with this libary we can
 <dependency>
     <groupId>io.github.hvantran</groupId>
     <artifactId>native-db-client</artifactId>
-    <version>1.0.0</version>
+    <version>1.0.2</version>
 </dependency>
 ```
 ## 3. Annotations
