@@ -12,30 +12,35 @@ An application is used to executing native database query based on annotations, 
 ```
 ## 2. Annotations
 ### a. Database
-**Database** annotation respresent for database information, it supports to input connection directly or binding from properties by using **{}** syntax
+**Database** annotation respresent for database connection.
+It supports to input connection directly or binding from properties by using **{}** syntax
 
 ### b. Select columns
-**Select** annotation respresent for an select statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+**Select** annotation respresent for an select statement.
+It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - From (required)
 - Where (optional)
 - OrderBy (optional)
 
 ### c. Update record
-**Update** annotation respresent for an update statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+**Update** annotation respresent for an update statement.
+It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Set (required)
 - Where (optional)
 
 ### d. Delete records
-**Delete** annotation respresent for an delete statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+**Delete** annotation respresent for an delete statement.
+It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Set (required)
 - Where (optional)
 
 ### e. Insert records
-**Insert** annotation respresent for an insert statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+**Insert** annotation respresent for an insert statement.
+It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Values (required)
 
 ### f. Generic query with NativeQuery
-**NativeQuery** annotation is a generic query, it can support prammeterize by using **{}** syntax
+**NativeQuery** annotation is a generic query. It can support prammeterize by using **{}** syntax
 
 ### g. Column
 **Column** annotation represent for a column in database, it will be mapped to a property in instances
