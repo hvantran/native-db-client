@@ -2,7 +2,7 @@
 
 An application is used to executing native database query based on annotations, then mapping the response to DTO classes
 
-# Install dependency from Maven Central repository
+## Install dependency from Maven Central repository
 ```
 <dependency>
     <groupId>io.github.hvantran</groupId>
@@ -10,9 +10,37 @@ An application is used to executing native database query based on annotations, 
     <version>1.0.0</version>
 </dependency>
 ```
+## Annotations
+### Database
+**Database** annotation respresent for database information, it supports to input connection directly or binding from properties by using **{}** syntax
 
+### Select columns
+**Select** annotation respresent for an select statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+- From (required)
+- Where (optional)
+- OrderBy (optional)
 
-# Using
+### Update record
+**Update** annotation respresent for an update statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+- Set (required)
+- Where (optional)
+
+### Delete records
+**Delete** annotation respresent for an delete statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+- Set (required)
+- Where (optional)
+
+### Insert records
+**Insert** annotation respresent for an insert statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
+- Values (required)
+
+### Generic query with NativeQuery
+**NativeQuery** annotation is a generic query, it can support prammeterize by using **{}** syntax
+
+### Column
+**Column** annotation represent for a column in database, it will be mapped to a property in instances
+
+## Using
 
 ### DTO classes
 **DTO** classes are using to mapping the collumns in response of SELECT command to DTO instances
@@ -34,7 +62,9 @@ public class EndpointResponseVO {
 
 ```
 ### Repositories
-Define repositories very simple by using annotations
+Define repositories very simple by using annotations, **it required to extend from GenericRepository**. 
+
+Look at below example:
 ```
 @Database(url = "{spring.datasource.url}", username = "{spring.datasource.username}", password = "{spring.datasource.password}")
 public interface EndpointSettingRepository extends GenericRepository {
@@ -69,7 +99,8 @@ public interface EndpointSettingRepository extends GenericRepository {
 
 ```
 
-That all what we need, now we can use the repositories
+**That all what we need, now we can use the repositories**
+
 ### Using repositories
 ```
     // Load properties file
@@ -77,7 +108,7 @@ That all what we need, now we can use the repositories
     Properties properties = new Properties();
     properties.load(resource);
 
-    // Create repository isntance by using Proxy factory
+    //** Create repository isntance by using Proxy factory**
     EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getRepositoryProxyInstance(EndpointSettingRepository.class, properties);
 
     List<EndpointSettingIdVO> endpointSettings = endpointSettingRepository.getEndpointSettings("MOnkey%", EndpointSettingIdVO.class);
