@@ -107,6 +107,9 @@ public interface EndpointSettingRepository extends GenericRepository {
 **That all what we need, now we can use the repositories**
 
 ### Using repositories
+
+Step 1: Create repository instances by using **RepoProxyFactory**
+
 ```
     // Load properties file
     InputStream resource = MOnkeyAccountCheckerV1.class.getClassLoader().getResourceAsStream("application.properties");
@@ -115,7 +118,10 @@ public interface EndpointSettingRepository extends GenericRepository {
 
     //** Create repository isntance by using Proxy factory**
     EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getRepositoryProxyInstance(EndpointSettingRepository.class, properties);
+```
 
+Step 2: **Execute queries**
+```
     List<EndpointSettingIdVO> endpointSettings = endpointSettingRepository.getEndpointSettings("MOnkey%", EndpointSettingIdVO.class);
     System.out.println(endpointSettings);
 
