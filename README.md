@@ -2,7 +2,7 @@
 
 An application is used to executing native database query based on annotations, then mapping the response to DTO classes
 
-## Install dependency from Maven Central repository
+## 1. Install dependency from Maven Central repository
 ```
 <dependency>
     <groupId>io.github.hvantran</groupId>
@@ -10,37 +10,37 @@ An application is used to executing native database query based on annotations, 
     <version>1.0.0</version>
 </dependency>
 ```
-## Annotations
-### Database
+## 2. Annotations
+### a. Database
 **Database** annotation respresent for database information, it supports to input connection directly or binding from properties by using **{}** syntax
 
-### Select columns
+### b. Select columns
 **Select** annotation respresent for an select statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - From (required)
 - Where (optional)
 - OrderBy (optional)
 
-### Update record
+### c. Update record
 **Update** annotation respresent for an update statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Set (required)
 - Where (optional)
 
-### Delete records
+### d. Delete records
 **Delete** annotation respresent for an delete statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Set (required)
 - Where (optional)
 
-### Insert records
+### e. Insert records
 **Insert** annotation respresent for an insert statement, it supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Values (required)
 
-### Generic query with NativeQuery
+### f. Generic query with NativeQuery
 **NativeQuery** annotation is a generic query, it can support prammeterize by using **{}** syntax
 
-### Column
+### g. Column
 **Column** annotation represent for a column in database, it will be mapped to a property in instances
 
-## Using
+## 3. Using
 
 ### DTO classes
 **DTO** classes are using to mapping the collumns in response of SELECT command to DTO instances
