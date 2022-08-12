@@ -10,8 +10,8 @@ An simple java libary to executing SQL queries, with this libary we can
 - Lazy init connection to database util the first method in repository is called
 - Only one database connection for each repository instance, that mean executing next method in repository will use the existing connection
 
-**Simple example**: Selecting some columns from specific tables
-### Define repositories
+### **Simple example**: Selecting some columns from specific tables
+#### Define repositories
 It is very simple by using annotations, **it required to extend from GenericRepository**. 
 ```java
 @Database(url = "{spring.datasource.url}", username = "{spring.datasource.username}", password = "{spring.datasource.password}")
@@ -27,7 +27,7 @@ public interface EndpointSettingRepository extends GenericRepository {
             "WHERE response.endpoint_config_id = setting.id")
     List<EndpointResponseV1> selectFields(Class<EndpointResponseV1> klass);
 ```
-### Define DTO classes
+#### Define DTO classes
 ```java
 @Getter
 @Setter
@@ -42,7 +42,7 @@ public class EndpointResponseDTO {
     private String column2;
 }
 ```
-### Using repositories
+#### Using repositories
 Using **RepoProxyFactory** to create instance from interfaces
 ```java
 EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getRepositoryProxyInstance(EndpointSettingRepository.class, properties);
