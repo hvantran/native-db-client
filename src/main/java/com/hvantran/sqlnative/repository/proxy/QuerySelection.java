@@ -1,23 +1,20 @@
 package com.hvantran.sqlnative.repository.proxy;
 
 import com.hvantran.sqlnative.annotations.*;
-import com.hvantran.sqlnative.interfaces.CheckedSupplier;
 import com.hvantran.sqlnative.interfaces.QueryExecution;
 import com.hvantran.sqlnative.utils.ObjectUtils;
 import com.hvantran.sqlnative.utils.Pair;
+import org.apache.commons.dbutils.QueryRunner;
+import org.apache.commons.dbutils.handlers.BeanListHandler;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.List;
-import java.util.Objects;
 import java.util.function.Function;
-import java.util.function.Predicate;
 
-@SuppressWarnings("unused")
 public enum QuerySelection implements QueryExecution {
     SELECT {
         @Override
@@ -49,15 +46,13 @@ public enum QuerySelection implements QueryExecution {
         public String generateQueryString(QueryInfo queryInfo) {
             LOGGER.info("Generating INSERT query string");
             String baseQuery = INSERT_QUERY_FORMAT.formatted(queryInfo.getInsert().value(), queryInfo.getValues().value());
-            StringBuilder queryBuilder = new StringBuilder(baseQuery);
-            return queryBuilder.append(";").toString();
+            return baseQuery.concat(";");
         }
 
         @Override
         public void validateQueryInfo(QueryInfo queryInfo) {
             LOGGER.info("Validate INSERT query {}", queryInfo);
             Insert insert = queryInfo.getInsert();
-            NativeQuery nativeQuery = queryInfo.getNativeQuery();
             boolean isNotNativeQuery = queryInfo.getNativeQuery() == null;
             ObjectUtils.checkThenThrow(isNotNativeQuery && (insert == null || StringUtils.isEmpty(insert.value())),
                     "INSERT clause cannot be NULL/Empty");
@@ -114,15 +109,15 @@ public enum QuerySelection implements QueryExecution {
     private static final String INSERT_QUERY_FORMAT = "INSERT INTO %s VALUES %s";
     private static final String UPDATE_QUERY_FORMAT = "UPDATE %s SET %s";
     private static final String DELETE_QUERY_FORMAT = "DELETE FROM %s";
-    private static final Function<QueryInfo,String> WHERE_FUNCTION = (queryInfo) -> " WHERE " + queryInfo.getWhere().value();
-    private static final Function<QueryInfo,String> ORDER_BY_FUNCTION = (queryInfo) -> " ORDER BY " + queryInfo.getOrderBy().value();
-    private static final Predicate<NativeQuery> NOT_NATIVE_QUERY = Objects::isNull;
+    private static final Function<QueryInfo,String> WHERE_FUNCTION = queryInfo -> " WHERE " + queryInfo.getWhere().value();
+    private static final Function<QueryInfo,String> ORDER_BY_FUNCTION = queryInfo -> " ORDER BY " + queryInfo.getOrderBy().value();
 
-    protected StringBuilder checkThenAppendString(boolean test, StringBuilder stringBuilder, Function<QueryInfo, String> appendStringSup, QueryInfo queryInfo) {
+    private final QueryRunner queryRunner = new QueryRunner();
+
+    protected void checkThenAppendString(boolean test, StringBuilder stringBuilder, Function<QueryInfo, String> appendStringSup, QueryInfo queryInfo) {
         if (test) {
             stringBuilder.append(appendStringSup.apply(queryInfo));
         }
-        return stringBuilder;
     }
 
     protected String replaceParamPlaceholders(String rawQuery, List<Pair<Param, Object>> queryParameters) {
@@ -138,25 +133,28 @@ public enum QuerySelection implements QueryExecution {
         return inputString.replace(String.format("{%s}", paramName), String.valueOf(param));
     }
 
-    @Override
-    public Pair<ResultSet, PreparedStatement> execute(QueryInfo queryInfo, Connection connection) {
-        validateQueryInfo(queryInfo);
-        String rawQueryString = getRawQueryString(queryInfo);
-        String queryString = replaceParamPlaceholders(rawQueryString, queryInfo.getParamPairs());
-        LOGGER.info("Executing query: {}", queryString);
-        CheckedSupplier<PreparedStatement> preparedStatementCheckedSupplier = () -> connection.prepareStatement(queryString);
-        PreparedStatement preparedStatement = preparedStatementCheckedSupplier.get();
-        CheckedSupplier<ResultSet> resultSetCheckedSupplier = () -> {
-            preparedStatement.execute();
-            return preparedStatement.getResultSet();
-        };
-        return Pair.of(resultSetCheckedSupplier.get(), preparedStatement);
-    }
-
     private String getRawQueryString(QueryInfo queryInfo) {
         if (queryInfo.getNativeQuery() != null) {
             return queryInfo.getNativeQuery().value();
         }
         return generateQueryString(queryInfo);
+    }
+
+    @Override
+    public <T> List<T> execute(QueryInfo queryInfo, Connection connection, Class<T> klass) throws SQLException {
+        validateQueryInfo(queryInfo);
+        String rawQueryString = getRawQueryString(queryInfo);
+        String queryString = replaceParamPlaceholders(rawQueryString, queryInfo.getParamPairs());
+        LOGGER.info("Executing query: {}", queryString);
+        return this.queryRunner.query(connection, queryString, new BeanListHandler<>(klass));
+    }
+
+    @Override
+    public int execute(QueryInfo queryInfo, Connection connection) throws SQLException {
+        validateQueryInfo(queryInfo);
+        String rawQueryString = getRawQueryString(queryInfo);
+        String queryString = replaceParamPlaceholders(rawQueryString, queryInfo.getParamPairs());
+        LOGGER.info("Executing query: {}", queryString);
+        return this.queryRunner.execute(connection, queryString);
     }
 }

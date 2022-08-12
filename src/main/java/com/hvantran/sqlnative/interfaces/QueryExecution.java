@@ -6,10 +6,14 @@ import com.hvantran.sqlnative.utils.Pair;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.List;
 
 public interface QueryExecution {
 
-    Pair<ResultSet, PreparedStatement> execute(QueryInfo queryBuilder, Connection statement);
+    <T> List<T> execute(QueryInfo queryInfo, Connection connection, Class<T> klass) throws SQLException;
+
+    int execute(QueryInfo queryInfo, Connection connection) throws SQLException;
 
     String generateQueryString(QueryInfo queryInfo);
 

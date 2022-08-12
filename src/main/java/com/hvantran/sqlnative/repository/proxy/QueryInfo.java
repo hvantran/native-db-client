@@ -36,8 +36,6 @@ public class QueryInfo {
 
     private List<Pair<Param, Object>> paramPairs;
 
-    private Class<?> mappingToClass;
-
     public QuerySelection getQuerySelection() {
         if (Objects.nonNull(this.nativeQuery)) {
             QuerySelection querySelection = getQuerySelectionFromNativeQuery();
@@ -55,7 +53,7 @@ public class QueryInfo {
         if (Objects.nonNull(this.select)) {
             return QuerySelection.SELECT;
         }
-        throw new AppException("Unsupported query. Only accept SELECT/UPDATE/INSERT/DELETE");
+        throw new UnsupportedOperationException("Unsupported query. Only accept SELECT/UPDATE/INSERT/DELETE");
     }
 
     private QuerySelection getQuerySelectionFromNativeQuery() {
