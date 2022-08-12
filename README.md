@@ -10,12 +10,61 @@ An simple java libary to executing SQL queries, with this libary we can
 - Lazy init connection to database util the first method in repository is called
 - Only one database connection for each repository instance, that mean executing next method in repository will use the existing connection
 
-## 2. Install dependency from Maven Central repository
+**Simple example**: Selecting some columns from specific tables
+### Define repositories
+It is very simple by using annotations, **it required to extend from GenericRepository**. 
+```java
+@Database(url = "{spring.datasource.url}", username = "{spring.datasource.username}", password = "{spring.datasource.password}")
+public interface EndpointSettingRepository extends GenericRepository {
+
+    @Select("ID, COLUMN1, COLUMN2, COLUMN3")
+    @From("endpoint_response")
+    @Where("endpoint_config_id = {endpoint_config_id} AND COLUMN8 is NULL AND COLUMN10 LIKE {column10}")
+    List<EndpointResponseDTO> getEndpointResponses(Class<EndpointResponseDTO> responseHandler, @Param("endpoint_config_id") String endpointSettingId, @Param("column10")String filterCol10);
+    
+    @NativeQuery("SELECT response.ID, setting.application " +
+            "FROM endpoint_response as response, endpoint_setting as setting " +
+            "WHERE response.endpoint_config_id = setting.id")
+    List<EndpointResponseV1> selectFields(Class<EndpointResponseV1> klass);
 ```
+### Define DTO classes
+```java
+@Getter
+@Setter
+@ToString
+public class EndpointResponseDTO {
+
+    private String id;
+
+    private String column1;
+
+    private String column3;
+    private String column2;
+}
+```
+### Using repositories
+Using **RepoProxyFactory** to create instance from interfaces
+```java
+EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getRepositoryProxyInstance(EndpointSettingRepository.class, properties);
+```
+Now, you can call the methods to executing SQL query to database
+```java
+    List<EndpointResponseVO> monkeyEndpointResponse = endpointSettingRepository
+                .getMonkeyEndpointResponse(EndpointResponseVO.class, endpointSettings.get(0).getId(), "'A%'");
+    System.out.println(monkeyEndpointResponse);
+    
+    //Output: [EndpointResponseVO(id=2, column1=DSA, column3=null, column2=ABCD)]
+```
+
+**Notes: Don't forget to call the close method on the repository when you done all the operations**
+
+
+## 2. Install dependency from Maven Central repository
+```maven
 <dependency>
     <groupId>io.github.hvantran</groupId>
     <artifactId>native-db-client</artifactId>
-    <version>1.0.2</version>
+    <version>1.1.0</version>
 </dependency>
 ```
 ## 3. Annotations
@@ -50,38 +99,45 @@ It supports prammeterize by using **{}** syntax, and can combine with below anno
 ### f. Generic query with NativeQuery
 **NativeQuery** annotation is a generic query. It can support prammeterize by using **{}** syntax
 
-### g. Column
-**Column** annotation represent for a column in database, it will be mapped to a property in instances
-
 ### h. Param
 **Param** annotation will matching a method argument with SQL query param
 
-## 4. Using
+## 4. Fully example with INSERT, UPDATE, DELETE, SELECT queries
 
 ### DTO classes
-**DTO** classes are using to mapping the collumns in response of SELECT command to DTO instances
-```
+```java
+@Getter
+@Setter
+@ToString
 public class EndpointResponseVO {
 
-    @Column(name = "ID")
     private String id;
 
-    @Column(name = "COLUMN1")
     private String column1;
 
-    @Column(name = "COLUMN3")
     private String column3;
-
-    @Column(name = "COLUMN2")
     private String column2;
 }
 
-```
-### Repositories
-Define repositories very simple by using annotations, **it required to extend from GenericRepository**. 
+@Getter
+@Setter
+@ToString
+public class EndpointResponseV1 {
 
-Look at below example:
+    private String application;
+
+    private String id;
+}
+
+@Getter
+@Setter
+@ToString
+public class EndpointSettingIdVO {
+    private String id;
+}
 ```
+### Create Repository
+```java
 @Database(url = "{spring.datasource.url}", username = "{spring.datasource.username}", password = "{spring.datasource.password}")
 public interface EndpointSettingRepository extends GenericRepository {
 
@@ -89,38 +145,38 @@ public interface EndpointSettingRepository extends GenericRepository {
     @From("endpoint_setting")
     @Where("application LIKE '{application}'")
     @OrderBy("application ASC")
-    List<EndpointSettingIdVO> getEndpointSettings(@Param("application") String applicationName, Class<EndpointSettingIdVO> responseHandler);
+    List<EndpointSettingIdVO> getEndpointSetting(@Param("application") String applicationName, Class<EndpointSettingIdVO> responseHandler);
 
 
     @Select("ID, COLUMN1, COLUMN2, COLUMN3")
     @From("endpoint_response")
     @Where("endpoint_config_id = {endpoint_config_id} AND COLUMN8 is NULL AND COLUMN10 LIKE {column10}")
-    List<EndpointResponseVO> getEndpointResponses(Class<EndpointResponseVO> responseHandler, @Param("endpoint_config_id") String endpointSettingId, @Param("column10")String filterCol10);
+    List<EndpointResponseVO> getEndpointResponse(Class<EndpointResponseVO> responseHandler, @Param("endpoint_config_id") String endpointSettingId, @Param("column10")String filterCol10);
 
     @Update("endpoint_response")
     @Set("COLUMN8={new_password}")
     @Where("ID={endpoint_response_id}")
-    int updatePassword(@Param("new_password") String newPassword, @Param("endpoint_response_id") String id);
+    int update(@Param("new_password") String newPassword, @Param("endpoint_response_id") String id);
 
     @Delete("endpoint_response")
     @Where("ID={endpoint_response_id}")
-    int deleteEndpointResponse(@Param("endpoint_response_id") String id);
+    int delete(@Param("endpoint_response_id") String id);
 
     @Insert("endpoint_response (ID, column1, column2, endpoint_config_id)")
     @Values("(2, 'DSA', 'ABCD', {endpoint_response_id})")
-    int insertEndpointResponse(@Param("endpoint_response_id") String id);
-    
-    @NativeQuery("SELECT ID FROM endpoint_response WHERE endpoint_config_id = {endpoint_response_id}")
-    List<EndpointSettingIdVO> getEndpointResponseByNativeQuery(@Param("endpoint_response_id") String id, Class<EndpointSettingIdVO> klass);
+    int insert(@Param("endpoint_response_id") String id);
 
+    @NativeQuery("SELECT response.ID, setting.application " +
+            "FROM endpoint_response as response, endpoint_setting as setting " +
+            "WHERE response.endpoint_config_id = setting.id")
+    List<EndpointResponseV1> getEndpointResponseByNativeQuery(Class<EndpointResponseV1> klass);
+}
 ```
-
-**That all what we need, now we can use the repositories**
 
 ### 5. Using repositories
 
 Step 1: Create repository instances by using **RepoProxyFactory**
-```
+```java
     // Load properties file (optional)
     InputStream resource = MOnkeyAccountCheckerV1.class.getClassLoader().getResourceAsStream("application.properties");
     Properties properties = new Properties();
@@ -130,20 +186,26 @@ Step 1: Create repository instances by using **RepoProxyFactory**
     EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getRepositoryProxyInstance(EndpointSettingRepository.class, properties);
 ```
 
-Step 2: **Execute queries**
-```
-    List<EndpointSettingIdVO> endpointSettings = endpointSettingRepository.getEndpointSettings("MOnkey%", EndpointSettingIdVO.class);
+Step 2: **Execute method in repository**
+```java
+    List<EndpointSettingIdVO> endpointSettings = endpointSettingRepository.getEndpointSetting("MOnkey%", EndpointSettingIdVO.class);
     System.out.println(endpointSettings);
 
     List<EndpointResponseVO> endpointResponses = endpointSettingRepository
-            .getEndpointResponses(EndpointResponseVO.class, endpointSettings.get(0).getId(), "'A%'");
+            .getEndpointResponse(EndpointResponseVO.class, endpointSettings.get(0).getId(), "'A%'");
     System.out.println(endpointResponses);
-    
-    endpointSettingRepository.updateEndpointResponse("'abcdsaefasd'", endpointSettings.get(0).getId());
-    
-    endpointSettingRepository.deleteEndpointResponse(endpointSettings.get(0).getId());
-    endpointSettingRepository.insertEndpointResponse("1");
 
-    endpointResponses= endpointSettingRepository.getEndpointResponseByNativeQuery("1", EndpointSettingIdVO.class);
-    System.out.println(endpointResponses);
+    int numberOfAffectRecords = endpointSettingRepository.update("'abcdsaefasd'", endpointResponses.get(0).getId());
+    System.out.println("Number of updated records: "+ numberOfAffectRecords);
+
+    numberOfAffectRecords = endpointSettingRepository.delete(endpointResponses.get(0).getId());
+    System.out.println("Number of deleted records: "+ numberOfAffectRecords);
+
+    numberOfAffectRecords = endpointSettingRepository.insert("1");
+    System.out.println("Number of insert records: "+ numberOfAffectRecords);
+
+    List<EndpointResponseV1> monkeyEndpointSettingId1s= endpointSettingRepository.getEndpointResponseByNativeQuery(EndpointResponseV1.class);
+    System.out.println(monkeyEndpointSettingId1s);
+
+    endpointSettingRepository.close();
 ```
