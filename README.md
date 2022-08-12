@@ -72,31 +72,31 @@ Now, you can call the methods to executing SQL query to database
 **Database** annotation respresent for database connection.
 It supports to input connection directly or binding from properties by using **{}** syntax
 
-### b. Select columns
+### b. Select
 **Select** annotation respresent for an select statement.
 It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - From (required)
 - Where (optional)
 - OrderBy (optional)
 
-### c. Update record
+### c. Update
 **Update** annotation respresent for an update statement.
 It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Set (required)
 - Where (optional)
 
-### d. Delete records
+### d. Delete
 **Delete** annotation respresent for an delete statement.
 It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Set (required)
 - Where (optional)
 
-### e. Insert records
+### e. Insert
 **Insert** annotation respresent for an insert statement.
 It supports prammeterize by using **{}** syntax, and can combine with below annotations:
 - Values (required)
 
-### f. Generic query with NativeQuery
+### f. NativeQuery
 **NativeQuery** annotation is a generic query. It can support prammeterize by using **{}** syntax
 
 ### h. Param
