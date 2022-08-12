@@ -64,7 +64,7 @@ Now, you can call the methods to executing SQL query to database
 <dependency>
     <groupId>io.github.hvantran</groupId>
     <artifactId>native-db-client</artifactId>
-    <version>1.1.0</version>
+    <version>1.1.1</version>
 </dependency>
 ```
 ## 3. Annotations
