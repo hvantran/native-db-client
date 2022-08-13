@@ -4,14 +4,16 @@
 ## 1. Intro
 An simple java libary to executing SQL queries, with this libary we can
 
+- No need to spend more effort to handle query to database
 - Easy to create and execute SQL query to database with supported annotations
-- Mapping response of select clause to DTO classes
+- Mapping response of select clause to classes
 - Parameterize the SQL queries with method arguments
 - Lazy init connection to database util the first method in repository is called
 - Only one database connection for each repository instance, that mean executing next method in repository will use the existing connection
 
 ### **Simple example**: Selecting some columns from specific tables
-#### Define repositories
+Step 1: **Define repositories**
+
 It is very simple by using annotations, **it required to extend from GenericRepository**. 
 ```java
 @Database(url = "{spring.datasource.url}", username = "{spring.datasource.username}", password = "{spring.datasource.password}")
@@ -27,7 +29,8 @@ public interface EndpointSettingRepository extends GenericRepository {
             "WHERE response.endpoint_config_id = setting.id")
     List<EndpointResponseV1> selectFields(Class<EndpointResponseV1> klass);
 ```
-#### Define DTO classes
+
+Step 2: **Define DTO classes**
 ```java
 @Getter
 @Setter
@@ -42,8 +45,8 @@ public class EndpointResponseDTO {
     private String column2;
 }
 ```
-#### Using repositories
-Using **RepoProxyFactory** to create instance from interfaces
+
+Step 3: **Using repositories**
 ```java
 EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getRepositoryProxyInstance(EndpointSettingRepository.class, properties);
 ```
@@ -56,7 +59,7 @@ Now, you can call the methods to executing SQL query to database
     //Output: [EndpointResponseDTO(id=2, column1=DSA, column3=null, column2=ABCD)]
 ```
 
-**Notes: Don't forget to call the close method on the repository when you done all the operations**
+**Notes: Don't forget to call the close method on the repository to close the database connection when you done all the operations**
 
 
 ## 2. Install dependency from Maven Central repository
