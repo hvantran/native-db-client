@@ -49,11 +49,11 @@ EndpointSettingRepository endpointSettingRepository = RepoProxyFactory.getReposi
 ```
 Now, you can call the methods to executing SQL query to database
 ```java
-    List<EndpointResponseVO> monkeyEndpointResponse = endpointSettingRepository
-                .getMonkeyEndpointResponse(EndpointResponseVO.class, endpointSettings.get(0).getId(), "'A%'");
-    System.out.println(monkeyEndpointResponse);
+    List<EndpointResponseDTO> endpointResponses = endpointSettingRepository
+                .getEndpointResponses(EndpointResponseDTO.class, endpointSettings.get(0).getId(), "'A%'");
+    System.out.println(endpointResponses);
     
-    //Output: [EndpointResponseVO(id=2, column1=DSA, column3=null, column2=ABCD)]
+    //Output: [EndpointResponseDTO(id=2, column1=DSA, column3=null, column2=ABCD)]
 ```
 
 **Notes: Don't forget to call the close method on the repository when you done all the operations**
